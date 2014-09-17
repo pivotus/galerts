@@ -8,6 +8,8 @@ alerts webpage.
 -   List all alerts associated with account.
 -   Create new alert for any google domain.
 -   Delete an alert
+-   Find alerts by query, id, data_id, feed_url, domain, language, how_many,
+    region, delivery
 
 ##  Example
 
@@ -34,6 +36,11 @@ manager.create("my keywords", {
 
 #   Delete an alert with alerts data_id
 manager.delete("alerts data_id")
+
+#   Find examples
+manager.find_by_query("keyword")
+manager.find_by_delivery(Galerts::RSS)
+manager.find({query: "keyword", delivery: Galerts::RSS})
 ```
 
 ##  Contribute
