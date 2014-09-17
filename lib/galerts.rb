@@ -1,6 +1,3 @@
-require File.expand_path('../galerts/alert', __FILE__)
-require File.expand_path('../galerts/manager', __FILE__)
-
 module Galerts
   # URLs
   CREATE_ALERT_URL = 'https://www.google.com/alerts/create?'
@@ -12,7 +9,7 @@ module Galerts
   # Google Return HTML Definitions
   ALERT_EXIST       = "[null,11,null,\"\"]"
   ALERT_SOMETHING_WENT_WRONG = "[null,7,null,\"\"]"
-
+  ALERT_NOT_EXIST = "[null,5,null,\"\"]"
   # Google Value
   BEST_RESULTS = 'Only the best results'
   ALL_RESULTS = 'All results'
@@ -25,13 +22,21 @@ module Galerts
   RSS = 'rss'
   EMAIL = 'email'
 
-  DELIVERY_TYPES = [RSS, EMAIL]
+  DELIVERY_TYPES = {
+    EMAIL => 1,
+    RSS => 2
+  }
+
 
   RT = 'As it happens'
   DAILY = 'Once a day'
   WEEKLY = 'Once a week'
 
-  FREQ_TYPES = [RT, DAILY, WEEKLY]
+  FREQ_TYPES = {
+    RT => 1,
+    DAILY => 2,
+    WEEKLY => 3
+  }
 
 
   BLOGS = 'Blogs'
@@ -50,3 +55,9 @@ module Galerts
     DISCUSSIONS => 7
   }
 end
+
+require File.expand_path('../galerts/alert', __FILE__)
+require File.expand_path('../galerts/manager', __FILE__)
+require File.expand_path('../galerts/version', __FILE__)
+
+

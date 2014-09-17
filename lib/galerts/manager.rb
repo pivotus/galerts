@@ -49,58 +49,59 @@ module Galerts
     def alerts
       result = []
       contents = alerts_page.css('div#gb-main div.main-page script').text
-
       contents = contents.gsub('null', 'nil')
-
       contents = eval(contents.gsub("window.STATE = ", ""))
 
-      # only 'id, search_query, feed_url, data_id' variables have true value,
-      # other variables have default Alert class values.
       contents[1][1].each do |alert|
         result << Alert.new(alert[2][3][1], {
           id:           alert[2].last.last.last,
-          search_query: alert[2][3][1],
+          query: alert[2][3][1],
           feed_url:     "/alerts/feeds/#{alert.last}/#{alert[2].last.last.last}",
           data_id:      alert[1],
-          domain:       'Unknown',
-          frequency:    'Unknown',
-          sources:      'Unknown',
-          language:     'Unknown',
-          how_many:     'Unknown',
-          region:       'Unknown',
-          delivery:     'Unknown'
+          domain:       alert[2][3][2],
+          language:     alert[2][3][3][1],
+          region:       alert[2][3][3][2],
+          frequency:    FREQ_TYPES.invert[alert[2][6][0][4]],
+          sources:      SOURCES_TYPES.invert[alert[2][4]],
+          how_many:     HOW_MANY_TYPES.invert[alert[2][5]],
+          delivery:     DELIVERY_TYPES.invert[alert[2][6][0][1]]
           }
         )
       end
       result
     end
 
-    def build_create_params(search_query, options)
-      # check parameters
-      raise "Unknown alert how_many" unless HOW_MANY_TYPES.has_key?(options[:how_many])
-      raise "Unknown alert delivery type" unless DELIVERY_TYPES.include?(options[:delivery])
-      raise "Unknown alert frequency type" unless FREQ_TYPES.include?(options[:frequency])
+    def find(attrs = {})
+      alerts.select{|a| attrs.keys.inject(true) {|memo,k| memo = memo && attrs[k] == a.send(k) }}
+    end
 
+    # Metaprogramming for find_by commands
+    variables = Galerts::Alert.new("").instance_variables.map {|m| m.to_s.delete('@')}
+    variables.each do |variable|
+      define_method("find_by_#{variable}") do |argument|
+        find({variable.to_sym => argument})
+      end
+    end
+
+    def build_create_params(alert)
       # set delivery and frequency parameters
-      if options[:delivery] == EMAIL
-        if options[:frequency] == DAILY
-          delivery_and_frequency = @email + ',[null,null,11],2'
-        elsif options[:frequency] == WEEKLY
-          delivery_and_frequency = @email + ',[null,null,11,1],3'
-        elsif options[:frequency] == RT
-          delivery_and_frequency = "1,\"#{@email}\",[],1"
+      if alert.delivery == EMAIL
+        if alert.frequency == DAILY
+          delivery_and_frequency = "#{DELIVERY_TYPES[EMAIL]},\"#{@email}\",[null,null,11],#{FREQ_TYPES[DAILY]}"
+        elsif alert.frequency == WEEKLY
+          delivery_and_frequency = "#{DELIVERY_TYPES[EMAIL]},\"#{@email}\",[null,null,11,1],#{FREQ_TYPES[WEEKLY]}"
+        elsif alert.frequency == RT
+          delivery_and_frequency = "#{DELIVERY_TYPES[EMAIL]},\"#{@email}\",[],#{FREQ_TYPES[RT]}"
         end
-      elsif options[:delivery] == RSS
-        delivery_and_frequency = "2,\"\",[],1"
+      elsif alert.delivery == RSS
+        delivery_and_frequency = "#{DELIVERY_TYPES[RSS]},\"\",[],#{FREQ_TYPES[RT]}"
       end
 
-      # options[:sources] ? sources = options[:sources] : sources = ""
-
-      if options[:sources].nil?
+      if alert.sources.empty?
         sources_text = 'null'
       else
         sources_text = "["
-        options[:sources].collect do |source|
+        alert.sources.collect do |source|
           raise "Unknown alert source" unless SOURCES_TYPES.has_key?(source)
           sources_text += SOURCES_TYPES[source].to_s + ','
         end
@@ -109,15 +110,17 @@ module Galerts
 
       # TODO: need more readable
       params = {
-        'params' => "[null,[null,null,null,[null,\"#{search_query}\",\"#{options[:domain]}\",[null,\"#{options[:language]}\",\"#{options[:region]}\"],null,null,null,#{options[:region] == "" ? 1 : 0},1],#{sources_text},#{HOW_MANY_TYPES[options[:how_many]]},[[null,#{delivery_and_frequency},\"#{options[:language] + '-' + options[:region].upcase}\",null,null,null,null,null,'0']]]]"
+        'params' => "[null,[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{alert.region}\"],null,null,null,#{alert.region == "" ? 1 : 0},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + alert.region.upcase}\",null,null,null,null,null,'0']]]]"
       }
 
       params = URI.encode_www_form(params)
     end
 
-    def create(search_query, options = {})
+    def create(query, options = {})
+      alert = Alert.new(query, options)
+
       x = alerts_page.css('div#gb-main div.main-page script').text.split(',').last[1..-4]
-      response = @agent.post("#{CREATE_ALERT_URL}x=#{x}", build_create_params(search_query, options), {'Content-Type' => 'application/x-www-form-urlencoded'})
+      response = @agent.post("#{CREATE_ALERT_URL}x=#{x}", build_create_params(alert), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
       if response.body == ALERT_EXIST
         raise "Alert exist!"
@@ -126,8 +129,6 @@ module Galerts
       else
         response_body = response.body.gsub('null', 'nil')
         created_alert = Nokogiri::HTML(eval(response_body)[4][0][2], nil, 'utf-8')
-
-        alert = Alert.new(search_query, options)
 
         if options[:delivery] == RSS
           alert.id = created_alert.css('a')[0]['href'].split('/').last if options[:delivery] == RSS
@@ -156,5 +157,6 @@ module Galerts
         raise "Something went wrong!" # internal error, html changed maybe
       end
     end
+
   end
 end
