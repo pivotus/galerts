@@ -6,7 +6,8 @@ alerts webpage.
 ##  Features
 
 -   List all alerts associated with account.
--   Create new alerts for any google domain.
+-   Create new alert for any google domain.
+-   Delete an alert
 
 ##  Example
 
@@ -30,6 +31,9 @@ manager.create("my keywords", {
   :delivery => Galerts::RSS
   }
 )
+
+#   Delete an alert with alerts data_id
+manager.delete("alerts data_id")
 ```
 
 ##  Contribute

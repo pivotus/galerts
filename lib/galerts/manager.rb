@@ -137,5 +137,24 @@ module Galerts
         alert
       end
     end
+
+    def build_delete_params(data_id)
+      params = {
+        'params' => "[null,\"#{data_id}\"]"
+      }
+
+      params = URI.encode_www_form(params)
+    end
+
+    def delete(data_id)
+      x = alerts_page.css('div#gb-main div.main-page script').text.split(',').last[1..-4]
+      response = @agent.post("#{DELETE_ALERT_URL}x=#{x}", build_delete_params(data_id), {'Content-Type' => 'application/x-www-form-urlencoded'})
+
+      if response.body == ALERT_NOT_EXIST
+        raise "Alert not exist!"
+      elsif response.body == ALERT_SOMETHING_WENT_WRONG
+        raise "Something went wrong!" # internal error, html changed maybe
+      end
+    end
   end
 end
