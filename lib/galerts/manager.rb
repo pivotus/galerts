@@ -83,39 +83,6 @@ module Galerts
       end
     end
 
-    def build_update_params(alert)
-      # set delivery and frequency parameters
-      if alert.delivery == EMAIL
-        if alert.frequency == DAILY
-          delivery_and_frequency = "#{DELIVERY_TYPES[EMAIL]},\"#{@email}\",[null,null,11],#{FREQ_TYPES[DAILY]}"
-        elsif alert.frequency == WEEKLY
-          delivery_and_frequency = "#{DELIVERY_TYPES[EMAIL]},\"#{@email}\",[null,null,11,1],#{FREQ_TYPES[WEEKLY]}"
-        elsif alert.frequency == RT
-          delivery_and_frequency = "#{DELIVERY_TYPES[EMAIL]},\"#{@email}\",[],#{FREQ_TYPES[RT]}"
-        end
-      elsif alert.delivery == RSS
-        delivery_and_frequency = "#{DELIVERY_TYPES[RSS]},\"\",[],#{FREQ_TYPES[RT]}"
-      end
-
-      if alert.sources.empty?
-        sources_text = 'null'
-      else
-        sources_text = "["
-        alert.sources.collect do |source|
-          raise "Unknown alert source" unless SOURCES_TYPES.has_key?(source)
-          sources_text += SOURCES_TYPES[source].to_s + ','
-        end
-        sources_text = sources_text.chop + ']'
-      end
-
-      # TODO: need more readable
-      params = {
-        'params' => "[null,[null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{alert.region}\"],null,null,null,#{alert.region == "" ? 1 : 0},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + alert.region.upcase}\",null,null,null,null,null,'0']]]]"
-      }
-
-      params = URI.encode_www_form(params)
-    end
-
     def build_params(alert, action)
       # set delivery and frequency parameters
       if alert.delivery == EMAIL
