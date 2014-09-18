@@ -119,6 +119,11 @@ module Galerts
           'params' => "[null,\"#{alert.data_id}\",[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{alert.region}\"],null,null,null,#{alert.region == "" ? 1 : 0},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + alert.region.upcase}\",null,null,null,null,null,\"#{alert.id}\"]]]]"
         }
         return URI.encode_www_form(params)
+      elsif action == 2 # delete
+        params = {
+          'params' => "[null,\"#{alert.data_id}\"]"
+        }
+        return URI.encode_www_form(params)
       end
     end
 
@@ -166,22 +171,16 @@ module Galerts
       end
     end
 
-    def build_delete_params(data_id)
-      params = {
-        'params' => "[null,\"#{data_id}\"]"
-      }
-      params = URI.encode_www_form(params)
-    end
-
-    def delete(data_id)
+    def delete(alert)
       x = alerts_page.css('div#gb-main div.main-page script').text.split(',').last[1..-4]
-      response = @agent.post("#{DELETE_ALERT_URL}x=#{x}", build_delete_params(data_id), {'Content-Type' => 'application/x-www-form-urlencoded'})
+      response = @agent.post("#{DELETE_ALERT_URL}x=#{x}", build_params(alert, 2), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
       if response.body == ALERT_NOT_EXIST
         raise "Alert not exist!"
       elsif response.body == ALERT_SOMETHING_WENT_WRONG
         raise "Something went wrong!" # internal error, html changed maybe
       end
+      true
     end
 
   end
