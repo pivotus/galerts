@@ -2,6 +2,7 @@ module Galerts
   # URLs
   CREATE_ALERT_URL = 'https://www.google.com/alerts/create?'
   DELETE_ALERT_URL = 'https://www.google.com/alerts/delete?'
+  MODIFY_ALERT_URL = 'https://www.google.com/alerts/modify?'
   GOOGLE_LOGIN_URL = 'https://accounts.google.com/ServiceLogin?'
   ALERTS_URL = 'https://www.google.com/alerts'
   LOGIN_URL = "#{GOOGLE_LOGIN_URL}service=alerts&continue=#{ALERTS_URL}"

@@ -83,7 +83,7 @@ module Galerts
       end
     end
 
-    def build_create_params(alert)
+    def build_update_params(alert)
       # set delivery and frequency parameters
       if alert.delivery == EMAIL
         if alert.frequency == DAILY
@@ -110,17 +110,56 @@ module Galerts
 
       # TODO: need more readable
       params = {
-        'params' => "[null,[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{alert.region}\"],null,null,null,#{alert.region == "" ? 1 : 0},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + alert.region.upcase}\",null,null,null,null,null,'0']]]]"
+        'params' => "[null,[null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{alert.region}\"],null,null,null,#{alert.region == "" ? 1 : 0},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + alert.region.upcase}\",null,null,null,null,null,'0']]]]"
       }
 
       params = URI.encode_www_form(params)
+    end
+
+    def build_params(alert, action)
+      # set delivery and frequency parameters
+      if alert.delivery == EMAIL
+        if alert.frequency == DAILY
+          delivery_and_frequency = "#{DELIVERY_TYPES[EMAIL]},\"#{@email}\",[null,null,11],#{FREQ_TYPES[DAILY]}"
+        elsif alert.frequency == WEEKLY
+          delivery_and_frequency = "#{DELIVERY_TYPES[EMAIL]},\"#{@email}\",[null,null,11,1],#{FREQ_TYPES[WEEKLY]}"
+        elsif alert.frequency == RT
+          delivery_and_frequency = "#{DELIVERY_TYPES[EMAIL]},\"#{@email}\",[],#{FREQ_TYPES[RT]}"
+        end
+      elsif alert.delivery == RSS
+        delivery_and_frequency = "#{DELIVERY_TYPES[RSS]},\"\",[],#{FREQ_TYPES[RT]}"
+      end
+
+      if alert.sources.empty?
+        sources_text = 'null'
+      else
+        sources_text = "["
+        alert.sources.collect do |source|
+          raise "Unknown alert source" unless SOURCES_TYPES.has_key?(source)
+          sources_text += SOURCES_TYPES[source].to_s + ','
+        end
+        sources_text = sources_text.chop + ']'
+      end
+
+      # TODO: need more readable
+      if action == 0 # create
+        params = {
+          'params' => "[null,[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{alert.region}\"],null,null,null,#{alert.region == "" ? 1 : 0},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + alert.region.upcase}\",null,null,null,null,null,'0']]]]"
+        }
+        return URI.encode_www_form(params)
+      elsif action == 1 # edit
+        params = {
+          'params' => "[null,\"#{alert.data_id}\",[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{alert.region}\"],null,null,null,#{alert.region == "" ? 1 : 0},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + alert.region.upcase}\",null,null,null,null,null,\"#{alert.id}\"]]]]"
+        }
+        return URI.encode_www_form(params)
+      end
     end
 
     def create(query, options = {})
       alert = Alert.new(query, options)
 
       x = alerts_page.css('div#gb-main div.main-page script').text.split(',').last[1..-4]
-      response = @agent.post("#{CREATE_ALERT_URL}x=#{x}", build_create_params(alert), {'Content-Type' => 'application/x-www-form-urlencoded'})
+      response = @agent.post("#{CREATE_ALERT_URL}x=#{x}", build_params(alert, 0), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
       if response.body == ALERT_EXIST
         raise "Alert exist!"
@@ -139,11 +178,31 @@ module Galerts
       end
     end
 
+    def update(alert)
+      x = alerts_page.css('div#gb-main div.main-page script').text.split(',').last[1..-4]
+      response = @agent.post("#{MODIFY_ALERT_URL}x=#{x}", build_params(alert, 1), {'Content-Type' => 'application/x-www-form-urlencoded'})
+
+      if response.body == ALERT_EXIST
+        raise "Alert exist!"
+      elsif response.body == ALERT_SOMETHING_WENT_WRONG
+        raise "Something went wrong!" # internal error, html changed maybe
+      else
+        response_body = response.body.gsub('null', 'nil')
+        created_alert = Nokogiri::HTML(eval(response_body)[4][0][2], nil, 'utf-8')
+
+        if alert.delivery == RSS
+          alert.id = created_alert.css('a')[0]['href'].split('/').last if alert.delivery == RSS
+          alert.feed_url = created_alert.css('a')[0]['href']
+        end
+        alert.data_id = created_alert.css('li')[0]['data-id']
+        alert
+      end
+    end
+
     def build_delete_params(data_id)
       params = {
         'params' => "[null,\"#{data_id}\"]"
       }
-
       params = URI.encode_www_form(params)
     end
 

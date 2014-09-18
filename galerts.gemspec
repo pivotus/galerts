@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.version       = Galerts::VERSION.dup
   s.date          = '2014-09-16'
   s.summary       = 'Ruby library to manage google alerts'
-  s.description   = %q{Manage to Google Alerts}
+  s.description   = %q{Ruby library to manage google alerts}
   s.authors       = ["Emre Can Yılmaz"]
   s.email         = ['emrecan@ecylmz.com']
   s.files         = `git ls-files`.split("\n")

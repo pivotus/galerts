@@ -7,9 +7,16 @@ alerts webpage.
 
 -   List all alerts associated with account.
 -   Create new alert for any google domain.
--   Delete an alert
+-   Update existing alert.
+-   Delete an alert.
 -   Find alerts by query, id, data_id, feed_url, domain, language, how_many,
-    region, delivery
+    region, delivery.
+
+##  Installation
+
+```sh
+gem install galerts
+```
 
 ##  Example
 
@@ -34,13 +41,20 @@ manager.create("my keywords", {
   }
 )
 
-#   Delete an alert with alerts data_id
-manager.delete("alerts data_id")
+alert = manager.alerts.last
+
+#   Update the query of this alert
+alert.query = "updated keyword"
+manager.update(alert)
 
 #   Find examples
 manager.find_by_query("keyword")
 manager.find_by_delivery(Galerts::RSS)
 manager.find({query: "keyword", delivery: Galerts::RSS})
+
+#   Delete an alert with alerts data_id
+manager.delete("alerts data_id")
+
 ```
 
 ##  Contribute
