@@ -6,12 +6,12 @@ module Galerts
       default_options = {
         id: 0,
         data_id: 0,
-        domain: 'com',
+        domain: DOMAIN,
         frequency: RT,
-        sources: '',
-        language: 'tr',
+        sources: AUTOMATIC,
+        language: LANGUAGE,
         how_many: ALL_RESULTS,
-        region: 'TR',
+        region: ANYWHERE,
         delivery: RSS,
         feed_url: nil
       }
