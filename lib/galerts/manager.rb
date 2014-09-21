@@ -60,7 +60,7 @@ module Galerts
           data_id:      alert[1],
           domain:       alert[2][3][2],
           language:     alert[2][3][3][1],
-          region:       alert[2][3][3][2],
+          region:       alert[2][3].last == 1 ? alert[2][3][3][2] : ANYWHERE,
           frequency:    FREQ_TYPES.invert[alert[2][6][0][4]],
           sources:      SOURCES_TYPES.invert[alert[2][4]],
           how_many:     HOW_MANY_TYPES.invert[alert[2][5]],
@@ -69,18 +69,6 @@ module Galerts
         )
       end
       result
-    end
-
-    def find(attrs = {})
-      alerts.select{|a| attrs.keys.inject(true) {|memo,k| memo = memo && attrs[k] == a.send(k) }}
-    end
-
-    # Metaprogramming for find_by commands
-    variables = Galerts::Alert.new("").instance_variables.map {|m| m.to_s.delete('@')}
-    variables.each do |variable|
-      define_method("find_by_#{variable}") do |argument|
-        find({variable.to_sym => argument})
-      end
     end
 
     def build_params(alert, action)
@@ -108,15 +96,23 @@ module Galerts
         sources_text = sources_text.chop + ']'
       end
 
+      if alert.region == ANYWHERE
+        region = REGION
+        anywhere = true
+      else
+        region = alert.region
+        anywhere = false
+      end
+
       # TODO: need more readable
       if action == 0 # create
         params = {
-          'params' => "[null,[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{alert.region}\"],null,null,null,#{alert.region == "" ? 1 : 0},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + alert.region.upcase}\",null,null,null,null,null,'0']]]]"
+          'params' => "[null,[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{region}\"],null,null,null,#{anywhere ? 0 : 1},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + region.upcase}\",null,null,null,null,null,'0']]]]"
         }
         return URI.encode_www_form(params)
       elsif action == 1 # edit
         params = {
-          'params' => "[null,\"#{alert.data_id}\",[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{alert.region}\"],null,null,null,#{alert.region == "" ? 1 : 0},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + alert.region.upcase}\",null,null,null,null,null,\"#{alert.id}\"]]]]"
+          'params' => "[null,\"#{alert.data_id}\",[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{region}\"],null,null,null,#{anywhere ? 1 : 0},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + region.upcase}\",null,null,null,null,null,\"#{alert.id}\"]]]]"
         }
         return URI.encode_www_form(params)
       elsif action == 2 # delete
@@ -183,5 +179,16 @@ module Galerts
       true
     end
 
+    def find(attrs = {})
+      alerts.select{|a| attrs.keys.inject(true) {|memo,k| memo = memo && attrs[k] == a.send(k) }}
+    end
+
+    # Metaprogramming for find_by commands
+    variables = Galerts::Alert.new("").instance_variables.map {|m| m.to_s.delete('@')}
+    variables.each do |variable|
+      define_method("find_by_#{variable}") do |argument|
+        find({variable.to_sym => argument})
+      end
+    end
   end
 end
