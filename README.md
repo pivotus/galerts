@@ -1,5 +1,11 @@
 #   Galerts
 
+[![Gem Version](https://badge.fury.io/rb/galerts.png)][gem]
+[![Build Status](https://secure.travis-ci.org/pivotus/galerts.png?branch=master)][travis]
+
+[gem]: http://badge.fury.io/rb/galerts
+[travis]: http://travis-ci.org/pivotus/galerts
+
 Simple Ruby library that uses Mechanize to scrape Google Alerts from the google
 alerts webpage.
 
