@@ -1,5 +1,4 @@
 language: ruby
-bundler_args: --without yard guard benchmarks
 rvm:
     - 2.1.0
     - 2.0.0
