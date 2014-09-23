@@ -56,7 +56,7 @@ module Galerts
         result << Alert.new(alert[2][3][1], {
           id:           alert[2].last.last.last,
           query: alert[2][3][1],
-          feed_url:     "/alerts/feeds/#{alert.last}/#{alert[2].last.last.last}",
+          feed_url:     "#{ALERTS_URL}/feeds/#{alert.last}/#{alert[2].last.last.last}",
           data_id:      alert[1],
           domain:       alert[2][3][2],
           language:     alert[2][3][3][1],
@@ -139,7 +139,7 @@ module Galerts
 
         if options[:delivery] == RSS
           alert.id = created_alert.css('a')[0]['href'].split('/').last if options[:delivery] == RSS
-          alert.feed_url = created_alert.css('a')[0]['href']
+          alert.feed_url = GOOGLE_URL + created_alert.css('a')[0]['href']
         end
         alert.data_id = created_alert.css('li')[0]['data-id']
         alert
@@ -160,7 +160,7 @@ module Galerts
 
         if alert.delivery == RSS
           alert.id = created_alert.css('a')[0]['href'].split('/').last if alert.delivery == RSS
-          alert.feed_url = created_alert.css('a')[0]['href']
+          alert.feed_url = GOOGLE_URL + created_alert.css('a')[0]['href']
         end
         alert.data_id = created_alert.css('li')[0]['data-id']
         alert

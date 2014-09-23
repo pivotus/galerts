@@ -3,7 +3,7 @@ require File.expand_path('../lib/galerts/version', __FILE__)
 Gem::Specification.new do |s|
   s.name          = 'galerts'
   s.version       = Galerts::VERSION.dup
-  s.date          = '2014-09-16'
+  s.date          = Time.now.strftime "%Y-%m-%d"
   s.summary       = 'Ruby library to manage google alerts'
   s.description   = %q{Ruby library to manage google alerts}
   s.authors       = ["Emre Can Yılmaz"]
