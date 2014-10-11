@@ -27,7 +27,7 @@ gem install galerts
 ##  Example
 
 ```ruby
-require 'google_alerts'
+require 'galerts'
 
 manager = Galerts::Manager.new('example@gmail.com', 'password')
 
