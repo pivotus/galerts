@@ -54,9 +54,9 @@ module Galerts
 
       contents[1][1].each do |alert|
         result << Alert.new(alert[2][3][1], {
-          id:           alert[2].last.last.last,
+          id:           alert[2][6][0][11],
           query: alert[2][3][1],
-          feed_url:     "#{ALERTS_URL}/feeds/#{alert.last}/#{alert[2].last.last.last}",
+          feed_url:     "#{ALERTS_URL}/feeds/#{alert.last}/#{alert[2][6][0][11]}",
           data_id:      alert[1],
           domain:       alert[2][3][2],
           language:     alert[2][3][3][1],
@@ -130,7 +130,7 @@ module Galerts
       response = @agent.post("#{CREATE_ALERT_URL}x=#{x}", build_params(alert, 0), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
       if response.body == ALERT_EXIST
-        raise "Alert exist!"
+        find_by_query(query).first
       elsif response.body == ALERT_SOMETHING_WENT_WRONG
         raise "Something went wrong!" # internal error, html changed maybe
       else
@@ -151,7 +151,7 @@ module Galerts
       response = @agent.post("#{MODIFY_ALERT_URL}x=#{x}", build_params(alert, 1), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
       if response.body == ALERT_EXIST
-        raise "Alert exist!"
+        find_by_query(query).first
       elsif response.body == ALERT_SOMETHING_WENT_WRONG
         raise "Something went wrong!" # internal error, html changed maybe
       else
