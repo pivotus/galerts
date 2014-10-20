@@ -126,7 +126,7 @@ module Galerts
     def create(query, options = {})
       alert = Alert.new(query, options)
 
-      x = alerts_page.css('div#gb-main div.main-page script').text.split(',').last[1..-4]
+      x = alerts_page.css('div#gb-main div.main-page script').text.split(',').last(12).first.tr('"/\"','')
       response = @agent.post("#{CREATE_ALERT_URL}x=#{x}", build_params(alert, 0), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
       if response.body == ALERT_EXIST
@@ -147,7 +147,7 @@ module Galerts
     end
 
     def update(alert)
-      x = alerts_page.css('div#gb-main div.main-page script').text.split(',').last[1..-4]
+      x = alerts_page.css('div#gb-main div.main-page script').text.split(',').last(12).first.tr('"/\"','')
       response = @agent.post("#{MODIFY_ALERT_URL}x=#{x}", build_params(alert, 1), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
       if response.body == ALERT_EXIST
@@ -168,7 +168,7 @@ module Galerts
     end
 
     def delete(alert)
-      x = alerts_page.css('div#gb-main div.main-page script').text.split(',').last[1..-4]
+      x = alerts_page.css('div#gb-main div.main-page script').text.split(',').last(12).first.tr('"/\"','')
       response = @agent.post("#{DELETE_ALERT_URL}x=#{x}", build_params(alert, 2), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
       if response.body == ALERT_NOT_EXIST

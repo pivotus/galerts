@@ -1,4 +1,11 @@
 module Galerts
+  # Default alert value
+  DOMAIN = 'com'
+  AUTOMATIC = ''
+  LANGUAGE = 'en'
+  REGION = 'US'
+  ANYWHERE = 'anywhere'
+
   # URLs
   CREATE_ALERT_URL = 'https://www.google.com/alerts/create?'
   DELETE_ALERT_URL = 'https://www.google.com/alerts/delete?'
@@ -50,6 +57,7 @@ module Galerts
   DISCUSSIONS = 'Discussions'
 
   SOURCES_TYPES = {
+    AUTOMATIC => 0,
     BLOGS => 1,
     NEWS => 2,
     WEB => 3,
@@ -59,10 +67,4 @@ module Galerts
   }
 
 
-  # Default alert value
-  DOMAIN = 'com'
-  AUTOMATIC = ''
-  LANGUAGE = 'en'
-  REGION = 'US'
-  ANYWHERE = 'anywhere'
 end
