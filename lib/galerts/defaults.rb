@@ -19,6 +19,7 @@ module Galerts
   ALERT_EXIST       = "[null,11,null,\"\"]"
   ALERT_SOMETHING_WENT_WRONG = "[null,7,null,\"\"]"
   ALERT_NOT_EXIST = "[null,5,null,\"\"]"
+  ALERT_LIMIT_EXCEEDED = "[null,4,null,\"\"]"
   # Google Value
   BEST_RESULTS = 'Only the best results'
   ALL_RESULTS = 'All results'

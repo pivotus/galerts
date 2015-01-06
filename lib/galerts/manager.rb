@@ -133,6 +133,8 @@ module Galerts
         find_by_query(query).first
       elsif response.body == ALERT_SOMETHING_WENT_WRONG
         raise "Something went wrong!" # internal error, html changed maybe
+      elsif response.body == ALERT_LIMIT_EXCEEDED
+        raise "You have exceeded the limit of 1000 alerts per account"
       else
         response_body = response.body.gsub('null', 'nil')
         created_alert = Nokogiri::HTML(eval(response_body)[4][0][2], nil, 'utf-8')
