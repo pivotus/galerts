@@ -183,6 +183,10 @@ module Galerts
       alerts.select{|a| attrs.keys.inject(true) {|memo,k| memo = memo && attrs[k] == a.send(k) }}
     end
 
+    def read(url)
+      @agent.get(url).body rescue raise "An error occurred while feed reading!"
+    end
+
     # Metaprogramming for find_by commands
     variables = Galerts::Alert.new("").instance_variables.map {|m| m.to_s.delete('@')}
     variables.each do |variable|
