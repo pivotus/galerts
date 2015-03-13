@@ -15,6 +15,8 @@ module Galerts
       @agent.keep_alive = true
       @agent.redirect_ok = true
       @agent.follow_meta_refresh = true
+      @agent.open_timeout=10
+      @agent.read_timeout=10
     end
 
     def login
