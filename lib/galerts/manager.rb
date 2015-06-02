@@ -114,7 +114,7 @@ module Galerts
         return URI.encode_www_form(params)
       elsif action == 1 # edit
         params = {
-          'params' => "[null,\"#{alert.data_id}\",[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{region}\"],null,null,null,#{anywhere ? 1 : 0},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + region.upcase}\",null,null,null,null,null,\"#{alert.id}\"]]]]"
+          'params' => "[null,\"#{alert.data_id}\",[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{region}\"],null,null,null,#{anywhere ? 0 : 1},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + region.upcase}\",null,null,null,null,null,\"#{alert.id}\"]]]]"
         }
         return URI.encode_www_form(params)
       elsif action == 2 # delete
