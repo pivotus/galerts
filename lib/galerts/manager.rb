@@ -60,6 +60,7 @@ module Galerts
           query: alert[2][3][1],
           feed_url:     "#{ALERTS_URL}/feeds/#{alert.last}/#{alert[2][6][0][11]}",
           data_id:      alert[1],
+          data_id_2:    alert[2][6][0].last,
           domain:       alert[2][3][2],
           language:     alert[2][3][3][1],
           region:       alert[2][3].last == 1 ? alert[2][3][3][2] : ANYWHERE,
@@ -109,12 +110,13 @@ module Galerts
       # TODO: need more readable
       if action == 0 # create
         params = {
-          'params' => "[null,[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{region}\"],null,null,null,#{anywhere ? 0 : 1},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + region.upcase}\",null,null,null,null,null,'0']]]]"
+          # 'params' => "[null,[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{region}\"],null,null,null,#{anywhere ? 0 : 1},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + region.upcase}\",null,null,null,null,null,'0']]]]"
+          'params' => "[null,[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{region}\"],null,null,null,#{anywhere ? 0 : 1},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + region.upcase}\",null,null,null,null,null,'0',null,null,\"#{alert.data_id_2}\"]]]]"
         }
         return URI.encode_www_form(params)
       elsif action == 1 # edit
         params = {
-          'params' => "[null,\"#{alert.data_id}\",[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{region}\"],null,null,null,#{anywhere ? 0 : 1},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + region.upcase}\",null,null,null,null,null,\"#{alert.id}\"]]]]"
+          'params' => "[null,\"#{alert.data_id}\",[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{region}\"],null,null,null,#{anywhere ? 0 : 1},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + region.upcase}\",null,null,null,null,null,\"#{alert.id}\",null,null,\"#{alert.data_id_2}\"]]]]"
         }
         return URI.encode_www_form(params)
       elsif action == 2 # delete
@@ -129,6 +131,7 @@ module Galerts
       alert = Alert.new(query, options)
 
       x = alerts_page.css('div#gb-main div.main-page script').text.split(',').grep(/AMJH/).first.tr('"/\"','')
+      alert.data_id_2 = alerts_page.css('div#gb-main div.main-page script').text.split(',').grep(/AB2X/).first.tr('"/\"','').tr('\]','')
       response = @agent.post("#{CREATE_ALERT_URL}x=#{x}", build_params(alert, 0), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
       if response.body == ALERT_EXIST
@@ -151,7 +154,8 @@ module Galerts
     end
 
     def update(alert)
-      x = alerts_page.css('div#gb-main div.main-page script').text.split(',').last(12).first.tr('"/\"','')
+      x = alerts_page.css('div#gb-main div.main-page script').text.split(',').grep(/AMJH/).first.tr('"/\"','')
+      alert.data_id_2 = alerts_page.css('div#gb-main div.main-page script').text.split(',').grep(/AB2X/).first.tr('"/\"','').tr('\]','')
       response = @agent.post("#{MODIFY_ALERT_URL}x=#{x}", build_params(alert, 1), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
       if response.body == ALERT_EXIST
@@ -172,7 +176,8 @@ module Galerts
     end
 
     def delete(alert)
-      x = alerts_page.css('div#gb-main div.main-page script').text.split(',').last(12).first.tr('"/\"','')
+      x = alerts_page.css('div#gb-main div.main-page script').text.split(',').grep(/AMJH/).first.tr('"/\"','')
+      alert.data_id_2 = alerts_page.css('div#gb-main div.main-page script').text.split(',').grep(/AB2X/).first.tr('"/\"','').tr('\]','')
       response = @agent.post("#{DELETE_ALERT_URL}x=#{x}", build_params(alert, 2), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
       if response.body == ALERT_NOT_EXIST

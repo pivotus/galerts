@@ -1,11 +1,12 @@
 module Galerts
   class Alert
-    attr_accessor :query, :id, :data_id, :domain, :frequency, :sources, :language, :how_many, :region, :delivery, :feed_url
+    attr_accessor :query, :id, :data_id, :data_id_2, :domain, :frequency, :sources, :language, :how_many, :region, :delivery, :feed_url
     def initialize(query, options = {})
 
       default_options = {
         id: 0,
         data_id: 0,
+        data_id_2: 0,
         domain: DOMAIN,
         frequency: RT,
         sources: AUTOMATIC,
@@ -38,6 +39,7 @@ module Galerts
       @query = query
       @id = options[:id]
       @data_id = options[:data_id]
+      @data_id_2 = options[:data_id_2]
       @domain = options[:domain]
       @frequency = options[:frequency]
       @sources = options[:sources]
