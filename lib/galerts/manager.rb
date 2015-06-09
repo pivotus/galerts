@@ -110,7 +110,6 @@ module Galerts
       # TODO: need more readable
       if action == 0 # create
         params = {
-          # 'params' => "[null,[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{region}\"],null,null,null,#{anywhere ? 0 : 1},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + region.upcase}\",null,null,null,null,null,'0']]]]"
           'params' => "[null,[null,null,null,[null,\"#{alert.query}\",\"#{alert.domain}\",[null,\"#{alert.language}\",\"#{region}\"],null,null,null,#{anywhere ? 0 : 1},1],#{sources_text},#{HOW_MANY_TYPES[alert.how_many]},[[null,#{delivery_and_frequency},\"#{alert.language + '-' + region.upcase}\",null,null,null,null,null,'0',null,null,\"#{alert.data_id_2}\"]]]]"
         }
         return URI.encode_www_form(params)

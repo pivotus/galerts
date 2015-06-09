@@ -20,6 +20,7 @@ module Galerts
   ALERT_SOMETHING_WENT_WRONG = "[null,7,null,\"\"]"
   ALERT_NOT_EXIST = "[null,5,null,\"\"]"
   ALERT_LIMIT_EXCEEDED = "[null,4,null,\"\"]"
+
   # Google Value
   BEST_RESULTS = 'Only the best results'
   ALL_RESULTS = 'All results'
@@ -29,7 +30,6 @@ module Galerts
     BEST_RESULTS => 3
   }
 
-
   RSS = 'rss'
   EMAIL = 'email'
 
@@ -37,7 +37,6 @@ module Galerts
     EMAIL => 1,
     RSS => 2
   }
-
 
   RT = 'As it happens'
   DAILY = 'Once a day'
@@ -48,7 +47,6 @@ module Galerts
     DAILY => 2,
     WEEKLY => 3
   }
-
 
   BLOGS = 'Blogs'
   NEWS = 'News'
@@ -66,6 +64,4 @@ module Galerts
     BOOKS => 6,
     DISCUSSIONS => 7
   }
-
-
 end
