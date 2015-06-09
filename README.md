@@ -15,8 +15,8 @@ alerts webpage.
 -   Create new alert for any google domain.
 -   Update existing alert.
 -   Delete an alert.
--   Find alerts by query, id, data_id, feed_url, domain, language, how_many,
-    region, delivery.
+-   Find alerts by query, id, data_id, data_id_2, feed_url, domain, language,
+    how_many, region, delivery.
 
 ##  Installation
 
