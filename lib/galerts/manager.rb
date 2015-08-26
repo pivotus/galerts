@@ -54,22 +54,23 @@ module Galerts
       contents = contents.gsub('null', 'nil')
       contents = eval(contents.gsub("window.STATE = ", ""))
 
-      contents[1][1].each do |alert|
-        result << Alert.new(alert[2][3][1], {
-          id:           alert[2][6][0][11],
-          query: alert[2][3][1],
-          feed_url:     "#{ALERTS_URL}/feeds/#{alert.last}/#{alert[2][6][0][11]}",
-          data_id:      alert[1],
-          data_id_2:    alert[2][6][0].last,
-          domain:       alert[2][3][2],
-          language:     alert[2][3][3][1],
-          region:       alert[2][3].last == 1 ? alert[2][3][3][2] : ANYWHERE,
-          frequency:    FREQ_TYPES.invert[alert[2][6][0][4]],
-          sources:      SOURCES_TYPES.invert[alert[2][4]],
-          how_many:     HOW_MANY_TYPES.invert[alert[2][5]],
-          delivery:     DELIVERY_TYPES.invert[alert[2][6][0][1]]
-          }
-        )
+      if contents[1]
+        contents[1][1].each do |alert|
+          result << Alert.new(alert[2][3][1], {
+            id:           alert[2][6][0][11],
+            query: alert[2][3][1],
+            feed_url:     "#{ALERTS_URL}/feeds/#{alert.last}/#{alert[2][6][0][11]}",
+            data_id:      alert[1],
+            data_id_2:    alert[2][6][0].last,
+            domain:       alert[2][3][2],
+            language:     alert[2][3][3][1],
+            region:       alert[2][3].last == 1 ? alert[2][3][3][2] : ANYWHERE,
+            frequency:    FREQ_TYPES.invert[alert[2][6][0][4]],
+            sources:      SOURCES_TYPES.invert[alert[2][4]],
+            how_many:     HOW_MANY_TYPES.invert[alert[2][5]],
+            delivery:     DELIVERY_TYPES.invert[alert[2][6][0][1]]
+          })
+        end
       end
       result
     end
