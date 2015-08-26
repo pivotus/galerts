@@ -1,3 +1,3 @@
 module Galerts
-  VERSION = '1.0.8'.freeze unless defined?(::Galerts::VERSION)
+  VERSION = '1.0.9'.freeze unless defined?(::Galerts::VERSION)
 end
