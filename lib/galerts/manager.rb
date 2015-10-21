@@ -159,7 +159,7 @@ module Galerts
       response = @agent.post("#{MODIFY_ALERT_URL}x=#{x}", build_params(alert, 1), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
       if response.body == ALERT_EXIST
-        find_by_query(query).first
+        find_by_query(alert.query).first
       elsif response.body == ALERT_SOMETHING_WENT_WRONG
         raise "Something went wrong!" # internal error, html changed maybe
       else
