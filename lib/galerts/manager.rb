@@ -200,7 +200,8 @@ module Galerts
     variables = Galerts::Alert.new("").instance_variables.map {|m| m.to_s.delete('@')}
     variables.each do |variable|
       define_method("find_by_#{variable}") do |argument|
-        find({variable.to_sym => argument})
+        # gsub maybe bad solution for phrases but ... ¯\_(ツ)_/¯
+        find({variable.to_sym => argument.gsub("\\","")})
       end
     end
   end
