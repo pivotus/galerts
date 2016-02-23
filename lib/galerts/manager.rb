@@ -31,17 +31,17 @@ module Galerts
     end
 
     def get_login_form_params(login_form)
-      params = {}
+      params = {
+        'Email'  => @email,
+        'Passwd' => @password
+      }
+
       login_form.each do |input|
-        if input['name'] == 'Email'
-          params[input['name']] = @email
-        elsif input['name'] == 'Passwd'
-          params[input['name']] = @password
-        else
+        unless ['Email', 'Passwd', nil].include? input['name']
           params[input['name']] = input['value']
         end
       end
-      return params
+      params
     end
 
     def alerts_page
