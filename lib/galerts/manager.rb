@@ -36,20 +36,6 @@ module Galerts
       end
     end
 
-    def get_login_form_params(login_form)
-      params = {
-        'Email'  => @email,
-        'Passwd' => @password
-      }
-
-      login_form.each do |input|
-        unless ['Email', 'Passwd', nil].include? input['name']
-          params[input['name']] = input['value']
-        end
-      end
-      params
-    end
-
     def alerts_page
       Nokogiri::HTML(@agent.get(ALERTS_URL).body, nil, 'utf-8')
     end
