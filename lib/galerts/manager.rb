@@ -21,9 +21,15 @@ module Galerts
 
     def login
       response = @agent.get(LOGIN_URL) # get login page
-      login_form = Nokogiri::HTML(response.body, nil, 'utf-8').css('form#gaia_loginform input') # get login form
-      params = get_login_form_params(login_form) # fetch form parameters and edit
-      response = @agent.post(LOGIN_URL, params) # do login
+
+      email_form = response.forms.first
+      email_form["Email"] = @email
+      email_response = email_form.submit
+
+      password_form = email_response.forms.first
+      password_form["Passwd"] = @password
+      response = password_form.submit
+
       error = response.parser.css('span[id^=errormsg]')
       unless error.empty?
         raise error.text.delete("\n").strip
